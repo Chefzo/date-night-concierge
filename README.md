@@ -56,8 +56,22 @@ A read-only dashboard at `/admin/metrics` (linked from the queue header):
 All computed from `requests` + `bookings` by the pure `lib/metrics.ts`
 (`computeMetrics`), so the page just renders the numbers.
 
-That completes the planned build: **intake → queue → text back → metrics**.
-The `packages` and `partners` tables ship in the migration for future use.
+## Phase 5 — packages library
+
+A curated library of go-to date nights, managed at `/admin/packages`:
+
+- **CRUD** for packages — name, venues/plan, estimated total, vibe tags, and
+  notes — with activate/deactivate and delete (authed
+  `/api/admin/packages` and `/api/admin/packages/[id]`).
+- **One-tap reuse** — the "Text back" composer now has a *Start from a
+  package* picker that prefills the venues, estimated check, and drafted
+  message. Only **active** packages appear there.
+- **Attribution** — confirming with a package selected records its
+  `package_id` on the `bookings` row, so bookings link back to the package
+  they came from.
+
+Backed by the `packages` table already in the migration — no schema change
+needed. The `partners` table remains for future use.
 
 ## Interactive demo
 

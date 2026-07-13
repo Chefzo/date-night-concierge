@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ConciergeRequest } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { ConciergeRequest, Package } from "@/lib/types";
 import { draftMessage } from "@/lib/message";
 
 type SendState =
@@ -24,15 +24,43 @@ export default function ConfirmComposer({
   const [message, setMessage] = useState(() => draftMessage(request));
   const [copied, setCopied] = useState(false);
   const [state, setState] = useState<SendState>({ kind: "idle" });
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [packageId, setPackageId] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/packages?active=1")
+      .then((r) => (r.ok ? r.json() : { packages: [] }))
+      .then((data) => {
+        if (!cancelled) setPackages(data.packages ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function draftFrom(nextVenues: string, nextEst: string) {
+    return draftMessage(request, {
+      date_of: dateOf || null,
+      venues_final: nextVenues || null,
+      est_check: nextEst ? Number(nextEst) : null,
+    });
+  }
 
   function regenerate() {
-    setMessage(
-      draftMessage(request, {
-        date_of: dateOf || null,
-        venues_final: venues || null,
-        est_check: est ? Number(est) : null,
-      })
-    );
+    setMessage(draftFrom(venues, est));
+  }
+
+  function applyPackage(id: string) {
+    setPackageId(id);
+    const pkg = packages.find((p) => p.id === id);
+    if (!pkg) return;
+    const nextVenues = pkg.venues ?? "";
+    const nextEst = pkg.est_total != null ? String(pkg.est_total) : "";
+    setVenues(nextVenues);
+    setEst(nextEst);
+    setMessage(draftFrom(nextVenues, nextEst));
   }
 
   async function copy() {
@@ -57,6 +85,7 @@ export default function ConfirmComposer({
           date_of: dateOf || null,
           venues_final: venues || null,
           est_check: est ? Number(est) : null,
+          package_id: packageId || null,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -84,6 +113,24 @@ export default function ConfirmComposer({
 
   return (
     <div className="mt-3 rounded-lg border border-white/10 bg-night-soft/60 p-3">
+      {packages.length > 0 && (
+        <label className="mb-2 block text-xs text-white/50">
+          Start from a package
+          <select
+            value={packageId}
+            onChange={(e) => applyPackage(e.target.value)}
+            className={`mt-1 ${inputClass}`}
+          >
+            <option value="">— none —</option>
+            {packages.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+                {p.est_total != null ? ` · ~$${Math.round(p.est_total)}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <label className="text-xs text-white/50">
           Date

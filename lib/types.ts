@@ -34,3 +34,14 @@ export type Booking = {
   confirmed_at: string | null;
   created_at: string;
 };
+
+export type Package = {
+  id: string;
+  name: string;
+  description: string | null;
+  venues: string | null;
+  est_total: number | null;
+  vibe_tags: string[] | null;
+  active: boolean;
+  created_at: string;
+};

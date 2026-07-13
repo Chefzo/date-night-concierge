@@ -41,6 +41,7 @@ export async function POST(
 
   const dateOf = clean(body.date_of, 20) || null;
   const venuesFinal = clean(body.venues_final, 500) || null;
+  const packageId = clean(body.package_id, 60) || null;
   const estRaw = body.est_check;
   const estCheck =
     typeof estRaw === "number" && Number.isFinite(estRaw) && estRaw >= 0
@@ -71,6 +72,7 @@ export async function POST(
   // Record the booking first so we never lose the plan even if the text fails.
   const { error: bookingErr } = await supabase.from("bookings").insert({
     request_id: req.id,
+    package_id: packageId,
     date_of: dateOf,
     venues_final: venuesFinal,
     est_check: estCheck,
