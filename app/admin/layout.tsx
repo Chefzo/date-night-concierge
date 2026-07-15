@@ -19,6 +19,12 @@ export default function AdminLayout({
         </Link>
         <nav className="flex items-center gap-4">
           <Link
+            href="/admin/bookings"
+            className="text-sm text-white/60 transition hover:text-white"
+          >
+            Bookings
+          </Link>
+          <Link
             href="/admin/packages"
             className="text-sm text-white/60 transition hover:text-white"
           >
