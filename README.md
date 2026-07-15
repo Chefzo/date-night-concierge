@@ -73,6 +73,17 @@ A curated library of go-to date nights, managed at `/admin/packages`:
 Backed by the `packages` table already in the migration — no schema change
 needed. The `partners` table remains for future use.
 
+## Phase 6 — bookings schedule
+
+Every confirmation writes a `bookings` row; `/admin/bookings` finally shows
+them. Linked from the queue header, it lists each planned night — couple,
+date, venues, estimated check, and the package it came from — joined back to
+`requests` and `packages`, and split into **Upcoming**, **No date set**, and
+**Past**, with a running count and total booked value for what's ahead.
+
+Read-only and backed by existing data — no schema change. The `partners`
+table remains for future use.
+
 ## Interactive demo
 
 A self-contained, no-backend prototype of the whole app lives at
