@@ -4,12 +4,12 @@ import LogoutButton from "./LogoutButton";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  requireAdmin();
+  await requireAdmin();
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-8">

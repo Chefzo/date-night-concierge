@@ -7,9 +7,9 @@ export const runtime = "nodejs";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAuthed()) {
+  if (!(await isAuthed())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -29,7 +29,7 @@ export async function PATCH(
   const { error } = await supabase
     .from("requests")
     .update({ status })
-    .eq("id", params.id);
+    .eq("id", (await params).id);
 
   if (error) {
     console.error("Status update failed:", error);

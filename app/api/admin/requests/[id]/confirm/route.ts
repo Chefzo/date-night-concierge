@@ -18,9 +18,9 @@ function clean(value: unknown, max = 500): string {
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAuthed()) {
+  if (!(await isAuthed())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -53,7 +53,7 @@ export async function POST(
   const { data: reqRow, error: loadErr } = await supabase
     .from("requests")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", (await params).id)
     .single();
 
   if (loadErr || !reqRow) {

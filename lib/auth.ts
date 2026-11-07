@@ -45,12 +45,12 @@ export function isValidSession(cookieValue: string | undefined): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export function isAuthed(): boolean {
-  const value = cookies().get(ADMIN_COOKIE)?.value;
+export async function isAuthed(): Promise<boolean> {
+  const value = (await cookies()).get(ADMIN_COOKIE)?.value;
   return isValidSession(value);
 }
 
 /** Use at the top of any protected server component; redirects if not authed. */
-export function requireAdmin(): void {
-  if (!isAuthed()) redirect("/login");
+export async function requireAdmin(): Promise<void> {
+  if (!(await isAuthed())) redirect("/login");
 }
